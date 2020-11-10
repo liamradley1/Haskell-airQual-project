@@ -4,6 +4,6 @@ import Lib
 import Database
 main :: IO ()
 main = do
-    someFunc
+    print "Initialising..."
     initialiseDB
-    someFunc
+    print "Done!"
