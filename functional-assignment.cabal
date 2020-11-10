@@ -1,0 +1,62 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 6d2f95cf9dd806ec4e86ec82f25ecab3342f6c8082852363a67beed5a321048a
+
+name:           functional-assignment
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/functional-assignment#readme>
+homepage:       https://github.com/githubuser/functional-assignment#readme
+bug-reports:    https://github.com/githubuser/functional-assignment/issues
+author:         Author name here
+maintainer:     example@example.com
+copyright:      2020 Author name here
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/githubuser/functional-assignment
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_functional_assignment
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable functional-assignment-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_functional_assignment
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , functional-assignment
+  default-language: Haskell2010
+
+test-suite functional-assignment-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_functional_assignment
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , functional-assignment
+  default-language: Haskell2010
