@@ -3,7 +3,14 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: HDBC-postgresql-2.4.0.0@sha256:6937915890091bac9da554eb73d939e56ebe080dac2ff006b05a6827687fb1b4,3050
+    pantry-tree:
+      size: 1611
+      sha256: 7548a8f6e70faa3649717dac6b62ded00101a5c9854305ec161cec657e06061f
+  original:
+    hackage: HDBC-postgresql-2.4.0.0
 snapshots:
 - completed:
     size: 532177
