@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2d5e4495b76ddbb4b8b9bddec5a042ba642ca1ee8193fde354ffc9986f80a9ec
+-- hash: 0d3caa32eb69f3bab5d2f467f9b4ec72958afb60f1dc3849e48833a928cf7cb6
 
 name:           functional-assignment
 version:        0.1.0.0
@@ -28,7 +28,8 @@ source-repository head
 library
   exposed-modules:
       Database
-      Lib
+      HTTP
+      Parse
   other-modules:
       Paths_functional_assignment
   hs-source-dirs:
@@ -36,7 +37,10 @@ library
   build-depends:
       HDBC
     , HDBC-postgresql
+    , aeson
     , base >=4.7 && <5
+    , bytestring
+    , http-conduit
   default-language: Haskell2010
 
 executable functional-assignment-exe
@@ -49,8 +53,11 @@ executable functional-assignment-exe
   build-depends:
       HDBC
     , HDBC-postgresql
+    , aeson
     , base >=4.7 && <5
+    , bytestring
     , functional-assignment
+    , http-conduit
   default-language: Haskell2010
 
 test-suite functional-assignment-test
@@ -64,6 +71,9 @@ test-suite functional-assignment-test
   build-depends:
       HDBC
     , HDBC-postgresql
+    , aeson
     , base >=4.7 && <5
+    , bytestring
     , functional-assignment
+    , http-conduit
   default-language: Haskell2010
