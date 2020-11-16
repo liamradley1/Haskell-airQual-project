@@ -22,7 +22,7 @@ initialiseDB = do
     \ latitude NUMERIC(10,6) NOT NULL, \
     \ longitude NUMERIC(10,6) NOT NULL, \
     \ country VARCHAR(16) NOT NULL, \
-    \ city VARCHAR(32) NOT NULL \
+    \ city VARCHAR(100) NOT NULL \
     \ )" []
     commit conn
     return conn
@@ -31,7 +31,7 @@ readingToSqlValues :: Reading -> [SqlValue]
 readingToSqlValues reading = [
         toSql $ location reading,
         toSql $ parameter reading, 
-        toSql $ local $ date reading, 
+        toSql $ utc $ date reading, 
         toSql $ value reading, 
         toSql $ unit reading, 
         toSql $ latitude $ coordinates reading, 
@@ -42,7 +42,7 @@ readingToSqlValues reading = [
 
 prepareInsertReadingStmt :: Connection -> IO Statement
 prepareInsertReadingStmt conn = prepare conn "INSERT INTO airQual VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-
+                                
 saveReadings :: [Reading] -> Connection -> IO ()
 saveReadings results conn = do
     stmt <- prepareInsertReadingStmt conn
