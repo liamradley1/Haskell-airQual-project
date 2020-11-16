@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: afe876d1634a39171abdd6dcbf0ed390258fc3483739ae7ecd13e2b775959e37
+-- hash: 2fc7618ecf7f0e1d46101e8762fef31af02c61a3b05c7b5843c409f9b5df93c2
 
 name:           functional-assignment
 version:        0.1.0.0
@@ -27,6 +27,7 @@ source-repository head
 
 library
   exposed-modules:
+      Automate
       Database
       HTTP
       Parse
@@ -46,7 +47,6 @@ library
 executable functional-assignment-exe
   main-is: Main.hs
   other-modules:
-      Automate
       Paths_functional_assignment
   hs-source-dirs:
       app
