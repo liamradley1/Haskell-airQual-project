@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2fc7618ecf7f0e1d46101e8762fef31af02c61a3b05c7b5843c409f9b5df93c2
+-- hash: a54058a2cd9b4808018a1479c0519a91d845d0bdea5cc9ce82d94905242c2775
 
 name:           functional-assignment
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Automate
       Database
+      DataTypes
       HTTP
       Parse
   other-modules:
