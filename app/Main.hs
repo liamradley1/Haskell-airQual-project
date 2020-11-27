@@ -16,13 +16,16 @@ main = do
     case (parse json) of -- Parsing the json file into a list of record
       Left errors -> print errors -- If the parsing fails, print the error
       Right record -> print . (take 3) $ (getField @"results" record)-- If parsing is sucessfull, we use getField from GHC.Records to disambiguate which 'results' & print the first 3 records
+      print "Initializing Database ..."
+            conn <- initialiseDB
 
     let urlForPara = "https://api.openaq.org/v1/parameters" -- The url of the API from where we are requesting the data from
     jsonPara <- download urlForPara -- Downloads the data
     case (parseParameters jsonPara) of -- Parsing the json file into a list of parameter
       Left errors -> print errors -- If the parsing fails, print the error
       Right para -> print para -- If parsing is sucessfull, print the response
-
+      print "Initializing Database ..."
+            conn <- initialiseDB
 
 
 

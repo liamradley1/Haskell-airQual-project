@@ -1,8 +1,63 @@
 --TO-DO: catch exception on local time not existing. If no local time then take UTC time
-module Database
-(
+ module Database
+     ( initialiseDB,
+     saveRecords
+     ) where
 
-)where
+import Database.HBDC
+import Database.HDBC.PostgreSQL
+import Parse
+
+initialiseDB :: IO Connection
+initialiseDB =
+    do
+        conn <- connectPostgreSQL "host=localhost dbname = airqual_db user=postgres password =admin"
+        run conn "CREATE TABLE IF NOT EXISTS locations (\
+            \locationId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
+            \location VARCHAR(100) NOT NULL,\
+            \city VARCHAR(100) NOT NULL,\
+            \country VARCHAR(100) NOT NULL,\
+            \latitude NUMERIC(10,6) NOT NULL,\
+            \longtitude NUMERIC(10,6) NOT NULL\
+            \)" []
+        
+        run conn "CREATE TABLE IF NOT EXISTS parameter(\
+            \id VARCHAR(100) NOT NULL PRIMARY KEY,\
+            \name VARCHAR(100) NOT NULL,\
+            \description VARCHAR(100) NOT NULL,\
+            \preferredUnit VARCHAR(100) NOT NULL\
+            \)"[]
+
+        run conn "CREATE TABLE IF NOT EXISTS measurements(\
+            \measurementId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
+            \locationId INTEGER NOT NULL,\
+            \id INTEGER NOT NULL,\
+            \value NUMERIC(10,6) NOT NULL,\
+            \lastUpdated VARCHAR(100) NOT NULL,\
+            \unit VARCHAR(100) NOT NULL\
+            \)"[]
+            
+        commit conn
+        return conn
+
+
+recordToSqlValues :: Record -> [SqlValues]
+recordToSqlValues record = [
+    toSql $ location record ,
+    toSql $ city     record,
+    toSql $ country  record,
+    toSql $ measurements record,
+    toSql $ coordinates record
+] 
+
+parametersToSqlValue :: Parameter -> [SqlValues]
+parametersToSqlValue parameter = [
+    toSql $  id  parameter ,
+    toSql $  name  parameter ,
+    toSql $  description parameter ,
+    toSql $  preferredUnit
+]
+
 
 -- module Database
 --     ( initialiseDB,
