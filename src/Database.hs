@@ -22,7 +22,7 @@ initialiseDB =
             \city VARCHAR(100) NOT NULL,\
             \country VARCHAR(100) NOT NULL,\
             \latitude NUMERIC(10,6) NOT NULL,\
-            \longtitude NUMERIC(10,6) NOT NULL\
+            \longitude NUMERIC(10,6) NOT NULL\
             \)" []
         
         run conn "CREATE TABLE IF NOT EXISTS parameter(\
@@ -44,14 +44,23 @@ initialiseDB =
         commit conn
         return conn
 
+-- This method is intended  to convert measurement variables to sqlValue first
+measurementToSqlValues :: Measurement -> [SqlValue]
+measurementToSqlValues measurement = [
+    toSql DataTypes.parameter measurement ,
+    toSql DataTypes.value     measurement ,
+    toSql DataTypes.lastUpdated measurement ,
+    toSql DataTypes.unit      measurement 
+]
 
 recordToSqlValues :: Record -> [SqlValue]
 recordToSqlValues record = [
     toSql $ location record,
     toSql $ city     record,
-    toSql $ country  record
-    -- toSql $ measurements record,
-    -- toSql $ coordinates record
+    toSql $ country  record,
+    toSql $ longitude $ coordinates record,
+    toSql $ latitude $ coordinates record ,
+    measurementToSqlValues        -- calling the method above to give us a list of sqlValue measurements
     ] 
 
 parametersToSqlValue :: Parameter -> [SqlValue]
