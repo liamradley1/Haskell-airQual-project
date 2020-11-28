@@ -21,7 +21,7 @@ main = do
         conn <- initialiseDB
         print "Database initialized..."
         print "Records of Record : "
-        recordToSqlValues $ record       --calling this method from Database.hs
+        --recordToSqlValues $ record      --calling this method from Database.hs
 
     let urlForPara = "https://api.openaq.org/v1/parameters" -- The url of the API from where we are requesting the data from
     jsonPara <- download urlForPara -- Downloads the data
@@ -33,8 +33,8 @@ main = do
         conn <- initialiseDB
         print "Database initialized..."
         print "Records of parameter : "
-        parametersToSqlValue $ para --calling this method from Database.hs
-        
+        --parametersToSqlValue $ para --calling this method from Database.hs
+
 
     --print json
 

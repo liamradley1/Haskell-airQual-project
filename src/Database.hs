@@ -13,8 +13,7 @@ import DataTypes
 -- import DataTypes ( Parameter(id, name, description, preferredUnit), Record(location, city, country, measurements, coordinates))
 
 initialiseDB :: IO Connection
-initialiseDB =
-    do
+initialiseDB = do
         conn <- connectPostgreSQL "host=localhost dbname = airqual_db user=postgres password =admin"
         run conn "CREATE TABLE IF NOT EXISTS locations (\
             \locationId SERIAL NOT NULL PRIMARY KEY,\
@@ -44,14 +43,17 @@ initialiseDB =
         commit conn
         return conn
 
--- This  method is intended  to convert measurement variables to sqlValue first
--- measurementToSqlValues :: Measurement -> [SqlValue]
--- measurementToSqlValues measurement = [
---     toSql $ parameter measurement,
---     toSql $ value measurement,
---     toSql $ lastUpdated measurement,
---     toSql $ unit measurement
---   ]
+
+--Maybe define a method which takes a list (of Measurements)and iterates through each Measurement and calls measurementToSqlValues (with the argument of each Measurement e.g. parameter, value, lastUpdated etc )
+
+ --This  method is intended  to convert measurement variables to sqlValue first
+measurementToSqlValues :: Measurement -> [SqlValue]
+measurementToSqlValues measurement = [
+     toSql $ parameter measurement,
+     toSql $ value measurement,
+     toSql $ lastUpdated measurement,
+     toSql $ unit measurement
+   ]
 
 recordToSqlValues :: Record -> [SqlValue]
 recordToSqlValues record = [
@@ -59,16 +61,17 @@ recordToSqlValues record = [
     toSql $ city record,
     toSql $ country record,
     toSql $ longitude $ coordinates record,
-    toSql $ latitude $ coordinates record
-    --measurementToSqlValues        -- calling the method above to give us a list of sqlValue measurements
+    toSql $ latitude $ coordinates record,
+    measurementToSqlValues     -- calling the method above to give us a list of sqlValue measurements
+    -- Call the new method defined above and pass the list of Measurements from the record
     ]
 
 parametersToSqlValue :: Parameter -> [SqlValue]
 parametersToSqlValue parameter = [
-    toSql $  DataTypes.id parameter,
-    toSql $  name  parameter,
-    toSql $  description parameter,
-    toSql $  preferredUnit parameter
+    toSql $ DataTypes.id parameter,
+    toSql $ name parameter,
+    toSql $ description parameter,
+    toSql $ preferredUnit parameter
     ]
 
 
