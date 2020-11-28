@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveGeneric #-}
-module DataTypes (Record(location, city, country, measurements, coordinates), Parameter(id, name, description, preferredUnit)) where
+module DataTypes (Record(location, city, country, measurements, coordinates), Parameter(id, name, description, preferredUnit), Measurement(parameter, value, lastUpdated, unit), Coordinates(latitude, longitude)) where
 
 import Data.Aeson
 import GHC.Generics

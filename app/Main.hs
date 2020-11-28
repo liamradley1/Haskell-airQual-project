@@ -37,7 +37,7 @@ main = do
         print "Records of parameter : "
         parametersToSqlValue $ Parameter Parse --calling this method from Database.hs
         print "Records of Record : "
-        recordToSqlValues $ Record Parse       --calling this method from Database.hs  
+        recordToSqlValues $ Record Parse       --calling this method from Database.hs
 
     --print json
 

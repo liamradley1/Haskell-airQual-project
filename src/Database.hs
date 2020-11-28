@@ -4,7 +4,7 @@
 --        saveRecords
 --      ) where
     module Database(
-        initialiseDB , parametersToSqlValue
+        initialiseDB , parametersToSqlValue, recordToSqlValues
     ) where
 
 import Database.HDBC
@@ -24,7 +24,7 @@ initialiseDB =
             \latitude NUMERIC(10,6) NOT NULL,\
             \longitude NUMERIC(10,6) NOT NULL\
             \)" []
-        
+
         run conn "CREATE TABLE IF NOT EXISTS parameter(\
             \id VARCHAR(100) NOT NULL PRIMARY KEY,\
             \name VARCHAR(100) NOT NULL,\
@@ -40,28 +40,28 @@ initialiseDB =
             \lastUpdated VARCHAR(100) NOT NULL,\
             \unit VARCHAR(100) NOT NULL\
             \)"[]
-            
+
         commit conn
         return conn
 
 -- This  method is intended  to convert measurement variables to sqlValue first
-measurementToSqlValues :: Measurement -> [SqlValue]
-measurementToSqlValues measurement = [
-    toSql DataTypes.parameter measurement ,
-    toSql DataTypes.value     measurement ,
-    toSql DataTypes.lastUpdated measurement ,
-    toSql DataTypes.unit      measurement 
-]
+-- measurementToSqlValues :: Measurement -> [SqlValue]
+-- measurementToSqlValues measurement = [
+--     toSql $ parameter measurement,
+--     toSql $ value measurement,
+--     toSql $ lastUpdated measurement,
+--     toSql $ unit measurement
+--   ]
 
 recordToSqlValues :: Record -> [SqlValue]
 recordToSqlValues record = [
     toSql $ location record,
-    toSql $ city     record,
-    toSql $ country  record,
+    toSql $ city record,
+    toSql $ country record,
     toSql $ longitude $ coordinates record,
-    toSql $ latitude $ coordinates record ,
-    measurementToSqlValues        -- calling the method above to give us a list of sqlValue measurements
-    ] 
+    toSql $ latitude $ coordinates record
+    --measurementToSqlValues        -- calling the method above to give us a list of sqlValue measurements
+    ]
 
 parametersToSqlValue :: Parameter -> [SqlValue]
 parametersToSqlValue parameter = [
