@@ -1,19 +1,23 @@
 --TO-DO: catch exception on local time not existing. If no local time then take UTC time
- module Database
-     ( initialiseDB,
-     saveRecords
-     ) where
+--  module Database
+--      ( initialiseDB,
+--        saveRecords
+--      ) where
+    module Database(
+        initialiseDB
+    ) where
 
-import Database.HBDC
+import Database.HDBC
 import Database.HDBC.PostgreSQL
-import Parse
+import DataTypes
+-- import DataTypes ( Parameter(id, name, description, preferredUnit), Record(location, city, country, measurements, coordinates))
 
 initialiseDB :: IO Connection
 initialiseDB =
     do
         conn <- connectPostgreSQL "host=localhost dbname = airqual_db user=postgres password =admin"
         run conn "CREATE TABLE IF NOT EXISTS locations (\
-            \locationId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
+            \locationId SERIAL NOT NULL PRIMARY KEY,\
             \location VARCHAR(100) NOT NULL,\
             \city VARCHAR(100) NOT NULL,\
             \country VARCHAR(100) NOT NULL,\
@@ -29,7 +33,7 @@ initialiseDB =
             \)"[]
 
         run conn "CREATE TABLE IF NOT EXISTS measurements(\
-            \measurementId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,\
+            \measurementId SERIAL PRIMARY KEY,\
             \locationId INTEGER NOT NULL,\
             \id INTEGER NOT NULL,\
             \value NUMERIC(10,6) NOT NULL,\
@@ -41,22 +45,22 @@ initialiseDB =
         return conn
 
 
-recordToSqlValues :: Record -> [SqlValues]
+recordToSqlValues :: Record -> [SqlValue]
 recordToSqlValues record = [
-    toSql $ location record ,
+    toSql $ location record,
     toSql $ city     record,
-    toSql $ country  record,
-    toSql $ measurements record,
-    toSql $ coordinates record
-] 
+    toSql $ country  record
+    -- toSql $ measurements record,
+    -- toSql $ coordinates record
+    ] 
 
-parametersToSqlValue :: Parameter -> [SqlValues]
+parametersToSqlValue :: Parameter -> [SqlValue]
 parametersToSqlValue parameter = [
-    toSql $  id  parameter ,
-    toSql $  name  parameter ,
-    toSql $  description parameter ,
-    toSql $  preferredUnit
-]
+    toSql $  DataTypes.id parameter,
+    toSql $  name  parameter,
+    toSql $  description parameter,
+    toSql $  preferredUnit parameter
+    ]
 
 
 -- module Database
