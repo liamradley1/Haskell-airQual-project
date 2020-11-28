@@ -4,7 +4,7 @@
 --        saveRecords
 --      ) where
     module Database(
-        initialiseDB
+        initialiseDB , parametersToSqlValue
     ) where
 
 import Database.HDBC
@@ -44,7 +44,7 @@ initialiseDB =
         commit conn
         return conn
 
--- This method is intended  to convert measurement variables to sqlValue first
+-- This  method is intended  to convert measurement variables to sqlValue first
 measurementToSqlValues :: Measurement -> [SqlValue]
 measurementToSqlValues measurement = [
     toSql DataTypes.parameter measurement ,

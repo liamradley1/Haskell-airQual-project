@@ -5,7 +5,7 @@ module Main where
 
 import HTTP --Importing the HTTP library
 import Parse -- Importing the Parse library
-import Database(initialiseDB) -- Importing the Database library
+import Database(initialiseDB,parametersToSqlValue,recordToSqlValues) -- Importing the Database library
 --import Automate(addListToDB, handleInput)
 import GHC.Records (getField)
 
@@ -30,15 +30,10 @@ main = do
         print "Initializing Database ..."
         conn <- initialiseDB
         print "Database initialized..."
-
-
-
-
-
-
-
-
-
+        print "Records of parameter : "
+        parametersToSqlValue $ Parameter Parse --calling this method from Database.hs
+        print "Records of Record : "
+        recordToSqlValues $ Record Parse       --calling this method from Database.hs
 
     --print json
 
