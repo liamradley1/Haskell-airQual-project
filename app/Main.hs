@@ -5,7 +5,7 @@ module Main where
 
 import HTTP --Importing the HTTP library
 import Parse -- Importing the Parse library
-import Database(initialiseDB,parametersToSqlValue,recordToSqlValues) -- Importing the Database library
+import Database(initialiseDB,parametersToSqlValue ,recordToSqlValues) -- Importing the Database library
 --import Automate(addListToDB, handleInput)
 import GHC.Records (getField)
 
@@ -20,10 +20,8 @@ main = do
         print "Initializing Database ..."
         conn <- initialiseDB
         print "Database initialized..."
-        print "Records of parameter : "
-        parametersToSqlValue $ Parameter Parse --calling this method from Database.hs
         print "Records of Record : "
-        recordToSqlValues $ Record Parse       --calling this method from Database.hs
+        recordToSqlValues $ record       --calling this method from Database.hs
 
     let urlForPara = "https://api.openaq.org/v1/parameters" -- The url of the API from where we are requesting the data from
     jsonPara <- download urlForPara -- Downloads the data
@@ -35,9 +33,8 @@ main = do
         conn <- initialiseDB
         print "Database initialized..."
         print "Records of parameter : "
-        parametersToSqlValue $ Parameter Parse --calling this method from Database.hs
-        print "Records of Record : "
-        recordToSqlValues $ Record Parse       --calling this method from Database.hs
+        parametersToSqlValue $ para --calling this method from Database.hs
+        
 
     --print json
 
