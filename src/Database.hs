@@ -4,7 +4,7 @@
 --        saveRecords
 --      ) where
     module Database(
-        initialiseDB , parametersToSqlValue, recordToSqlValues
+        initialiseDB , saveRecords , saveParameters , saveMeasurements
     ) where
 
 import Database.HDBC
@@ -44,7 +44,8 @@ initialiseDB = do
         return conn
 
 
---Maybe define a method which takes a list (of Measurements)and iterates through each Measurement and calls measurementToSqlValues (with the argument of each Measurement e.g. parameter, value, lastUpdated etc )
+--Maybe define a method which takes a list (of Measurements)and iterates through each Measurement 
+--and calls measurementToSqlValues (with the argument of each Measurement e.g. parameter, value, lastUpdated etc )
 
  --This  method is intended  to convert measurement variables to sqlValue first
 measurementToSqlValues :: Measurement -> [SqlValue]
@@ -55,6 +56,13 @@ measurementToSqlValues measurement = [
      toSql $ unit measurement
    ]
 
+-- This method maps each element of a list of measurements to sqlValue
+measurementListToSqlValues:: [Measurement] -> [SqlValue]  -- or it might give us a list of list of sql as output?
+                                                          -- [[SqlValue]]
+measurementListToSqlValues measurementList = [             
+  map measurementToSqlValues measurementList
+]
+
 recordToSqlValues :: Record -> [SqlValue]
 recordToSqlValues record = [
     toSql $ location record,
@@ -62,8 +70,8 @@ recordToSqlValues record = [
     toSql $ country record,
     toSql $ longitude $ coordinates record,
     toSql $ latitude $ coordinates record,
-    measurementToSqlValues     -- calling the method above to give us a list of sqlValue measurements
-    -- Call the new method defined above and pass the list of Measurements from the record
+    measurementListToSqlValues $  [Measurement] record
+    -- Calling method above to convert a list of measurements in record, into sqlValue
     ]
 
 parametersToSqlValue :: Parameter -> [SqlValue]
@@ -75,6 +83,39 @@ parametersToSqlValue parameter = [
     ]
 
 
+-- Please uncomment codes below when other methods run correctly
+
+--prepareInsertLocationStmt :: Connection -> IO Statement
+--prepareInsertLocationStmt conn = prepare conn "INSERT INTO locations VALUES (DEFAULT, ?, ?, ?, ?, ?)"
+
+--saveRecords :: [Record] -> Connection -> IO ()
+--saveRecords records conn = do
+--                  stmt <- prepareInsertLocationStmt conn
+--                    executeMany stmt (map recordToSqlValues records)
+--                    commit conn
+
+
+--prepareInsertParameterStmt :: Connection -> IO Statement
+--prepareInsertParameterStmt conn = prepare conn "INSERT INTO parameter VALUES (?, ?, ?, ?)"
+
+--saveParameters :: [Parameter] -> Connection -> IO ()
+--saveParameters parameters conn = do
+--                          stmt <- prepareInsertParameterStmt conn
+--                          executeMany stmt (map parametersToSqlValue parameters)
+--                          commit conn
+
+--prepareInsertMeasurementStmt :: Connection -> IO Statement
+--prepareInsertMeasurementStmt conn = prepare conn "INSERT INTO measurements VALUES (DEFAULT, ?, ?, ?, ?, ?)"
+
+-- I'm not sure about this part , if it works for measurement or not
+--saveMeasurements :: [Measurement] -> Connection -> IO ()
+--saveMeasurements measurements conn = do
+--                              stmt <- prepareInsertMeasurementStmt conn
+--                              executeMany stmt (map measurementToSqlValues measurements)
+--                              commit conn
+
+
+-------------------------------------------------previous codes--------------------------------------------------------
 -- module Database
 --     ( initialiseDB,
 --     saveReadings
