@@ -6,7 +6,6 @@ module Main where
 import HTTP --Importing the HTTP library
 import Parse -- Importing the Parse library
 import Database (initialiseDB , saveRecords , saveParameters , saveMeasurements) -- Importing the Database library
---import Automate(addListToDB, handleInput)
 import GHC.Records (getField)
 
 main :: IO ()
@@ -22,8 +21,8 @@ main = do
         print "Database initialized..."
 
         --Please uncomment these 2 lines , when Database.hs is working fine
-       -- saveRecords (records record) conn
-       -- print "Records saved into db" 
+        saveRecords (getField @"results" record) conn
+        print "Records saved into db" 
         
         
 
@@ -38,8 +37,8 @@ main = do
         print "Database initialized..."
         
         --Please uncomment these 2 lines , when Database.hs is working fine
-       -- saveParameters (parameters para) conn
-       -- print "Parameters saved into db"
+        saveParameters (getField @"results" para) conn
+        print "Parameters saved into db"
         
         
 

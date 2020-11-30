@@ -1,3 +1,8 @@
+{-# LANGUAGE DeriveGeneric #-} -- Language extention
+{-# LANGUAGE DuplicateRecordFields #-} -- Using DuplicateRecordFields allows the records to use duplicate field labels.
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE TypeApplications #-}
+
 --TO-DO: catch exception on local time not existing. If no local time then take UTC time
 --  module Database
 --      ( initialiseDB,
@@ -10,7 +15,9 @@
 import Database.HDBC
 import Database.HDBC.PostgreSQL
 import DataTypes
--- import DataTypes ( Parameter(id, name, description, preferredUnit), Record(location, city, country, measurements, coordinates))
+import Parse
+import GHC.Records (getField)
+
 
 initialiseDB :: IO Connection
 initialiseDB = do
@@ -54,14 +61,11 @@ measurementToSqlValues measurement = [
      toSql $ value measurement,
      toSql $ lastUpdated measurement,
      toSql $ unit measurement
-   ]
+    ]
 
 -- This method maps each element of a list of measurements to sqlValue
-measurementListToSqlValues:: [Measurement] -> [SqlValue]  -- or it might give us a list of list of sql as output?
-                                                          -- [[SqlValue]]
-measurementListToSqlValues measurementList = [             
-  map measurementToSqlValues measurementList
-]
+measurementListToSqlValues :: [Measurement] -> [[SqlValue]] -- or it might give us a list of list of sql as output?
+measurementListToSqlValues = map measurementToSqlValues 
 
 recordToSqlValues :: Record -> [SqlValue]
 recordToSqlValues record = [
@@ -69,8 +73,7 @@ recordToSqlValues record = [
     toSql $ city record,
     toSql $ country record,
     toSql $ longitude $ coordinates record,
-    toSql $ latitude $ coordinates record,
-    measurementListToSqlValues $  [Measurement] record
+    toSql $ latitude $ coordinates record
     -- Calling method above to convert a list of measurements in record, into sqlValue
     ]
 
@@ -85,34 +88,33 @@ parametersToSqlValue parameter = [
 
 -- Please uncomment codes below when other methods run correctly
 
---prepareInsertLocationStmt :: Connection -> IO Statement
---prepareInsertLocationStmt conn = prepare conn "INSERT INTO locations VALUES (DEFAULT, ?, ?, ?, ?, ?)"
+prepareInsertLocationStmt :: Connection -> IO Statement
+prepareInsertLocationStmt conn = prepare conn "INSERT INTO locations VALUES (DEFAULT, ?, ?, ?, ?, ?)"
 
---saveRecords :: [Record] -> Connection -> IO ()
---saveRecords records conn = do
---                  stmt <- prepareInsertLocationStmt conn
---                    executeMany stmt (map recordToSqlValues records)
---                    commit conn
+saveRecords :: [Record] -> Connection -> IO ()
+saveRecords records conn = do
+                stmt <- prepareInsertLocationStmt conn
+                executeMany stmt (map recordToSqlValues records)
+                commit conn
 
+prepareInsertParameterStmt :: Connection -> IO Statement
+prepareInsertParameterStmt conn = prepare conn "INSERT INTO parameter VALUES (?, ?, ?, ?)"
 
---prepareInsertParameterStmt :: Connection -> IO Statement
---prepareInsertParameterStmt conn = prepare conn "INSERT INTO parameter VALUES (?, ?, ?, ?)"
+saveParameters :: [Parameter] -> Connection -> IO ()
+saveParameters parameters conn = do
+                         stmt <- prepareInsertParameterStmt conn
+                         executeMany stmt (map parametersToSqlValue parameters)
+                         commit conn
 
---saveParameters :: [Parameter] -> Connection -> IO ()
---saveParameters parameters conn = do
---                          stmt <- prepareInsertParameterStmt conn
---                          executeMany stmt (map parametersToSqlValue parameters)
---                          commit conn
-
---prepareInsertMeasurementStmt :: Connection -> IO Statement
---prepareInsertMeasurementStmt conn = prepare conn "INSERT INTO measurements VALUES (DEFAULT, ?, ?, ?, ?, ?)"
+prepareInsertMeasurementStmt :: Connection -> IO Statement
+prepareInsertMeasurementStmt conn = prepare conn "INSERT INTO measurements VALUES (DEFAULT, ?, ?, ?, ?, ?)"
 
 -- I'm not sure about this part , if it works for measurement or not
---saveMeasurements :: [Measurement] -> Connection -> IO ()
---saveMeasurements measurements conn = do
---                              stmt <- prepareInsertMeasurementStmt conn
---                              executeMany stmt (map measurementToSqlValues measurements)
---                              commit conn
+saveMeasurements :: [Measurement] -> Connection -> IO ()
+saveMeasurements measurements conn = do
+                            stmt <- prepareInsertMeasurementStmt conn
+                            executeMany stmt (measurementListToSqlValues measurements)
+                            commit conn
 
 
 -------------------------------------------------previous codes--------------------------------------------------------

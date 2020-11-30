@@ -6,7 +6,7 @@ import GHC.Generics
 
 data Measurement = Measurement { -- Custom data type definition
   parameter :: String,
-  value :: Float,
+  value :: Double,
   lastUpdated :: String,
   unit :: String
 } deriving (Show, Generic) -- Making the new type an instance of the built in type classes
