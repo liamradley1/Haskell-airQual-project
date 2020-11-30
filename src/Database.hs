@@ -3,11 +3,6 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
 
---TO-DO: catch exception on local time not existing. If no local time then take UTC time
---  module Database
---      ( initialiseDB,
---        saveRecords
---      ) where
     module Database(
         initialiseDB , saveRecords , saveParameters , saveMeasurements
     ) where
@@ -19,7 +14,7 @@ import Parse
 import GHC.Records (getField)
 
 
-initialiseDB :: IO Connection
+initialiseDB :: IO Connection -- ^ An IO function that initialises the databases if they do not already exist. Returns an IO Connection
 initialiseDB = do
         conn <- connectPostgreSQL "host=localhost dbname = airqual_db user=postgres password =admin"
         run conn "CREATE TABLE IF NOT EXISTS locations (\
@@ -51,11 +46,8 @@ initialiseDB = do
         return conn
 
 
---Maybe define a method which takes a list (of Measurements)and iterates through each Measurement 
---and calls measurementToSqlValues (with the argument of each Measurement e.g. parameter, value, lastUpdated etc )
-
- --This  method is intended  to convert measurement variables to sqlValue first
-measurementToSqlValues :: Measurement -> [SqlValue]
+ 
+measurementToSqlValues :: Measurement -> [SqlValue] -- ^ Takes a Measurement as input and returns it as a list of SqlValues - a format that can be used in a prepared statement
 measurementToSqlValues measurement = [
      toSql $ parameter measurement,
      toSql $ value measurement,
@@ -63,8 +55,7 @@ measurementToSqlValues measurement = [
      toSql $ unit measurement
     ]
 
--- This method maps each element of a list of measurements to sqlValue
-measurementListToSqlValues :: [Measurement] -> [[SqlValue]] -- or it might give us a list of list of sql as output?
+measurementListToSqlValues :: [Measurement] -> [[SqlValue]] -- ^ Automation function that takes a list of Measurements and returns a list of lists of SQLValues for insertion
 measurementListToSqlValues = map measurementToSqlValues 
 
 recordToSqlValues :: Record -> [SqlValue]
@@ -74,10 +65,9 @@ recordToSqlValues record = [
     toSql $ country record,
     toSql $ longitude $ coordinates record,
     toSql $ latitude $ coordinates record
-    -- Calling method above to convert a list of measurements in record, into sqlValue
     ]
 
-parametersToSqlValue :: Parameter -> [SqlValue]
+parametersToSqlValue :: Parameter -> [SqlValue] -- ^ Takes a Parameter as input, then returns a list of SQLValues for insertion
 parametersToSqlValue parameter = [
     toSql $ DataTypes.id parameter,
     toSql $ name parameter,
@@ -86,31 +76,28 @@ parametersToSqlValue parameter = [
     ]
 
 
--- Please uncomment codes below when other methods run correctly
-
-prepareInsertLocationStmt :: Connection -> IO Statement
+prepareInsertLocationStmt :: Connection -> IO Statement -- ^ Provides a prepared statement for inserting locations into the database. Takes a Connection as an input. Returns an IO Statement 
 prepareInsertLocationStmt conn = prepare conn "INSERT INTO locations VALUES (DEFAULT, ?, ?, ?, ?, ?)"
 
-saveRecords :: [Record] -> Connection -> IO ()
+saveRecords :: [Record] -> Connection -> IO () -- ^ Takes a list of Records and a Connection as input. Inserts records into the database. Returns an IO ()
 saveRecords records conn = do
                 stmt <- prepareInsertLocationStmt conn
                 executeMany stmt (map recordToSqlValues records)
                 commit conn
 
-prepareInsertParameterStmt :: Connection -> IO Statement
+prepareInsertParameterStmt :: Connection -> IO Statement -- ^ Provides a prepared statement for inserting parameters into the database. Takes a Connection as input. Returns an IO Statement
 prepareInsertParameterStmt conn = prepare conn "INSERT INTO parameter VALUES (?, ?, ?, ?)"
 
-saveParameters :: [Parameter] -> Connection -> IO ()
+saveParameters :: [Parameter] -> Connection -> IO () -- ^ Takes a list of Parameters and a Connection as input. Inserts parameters into the database. Returns an IO ()
 saveParameters parameters conn = do
                          stmt <- prepareInsertParameterStmt conn
                          executeMany stmt (map parametersToSqlValue parameters)
                          commit conn
 
-prepareInsertMeasurementStmt :: Connection -> IO Statement
+prepareInsertMeasurementStmt :: Connection -> IO Statement -- ^ Provides a prepared statement for inserting measurements into the database. Takes a Connection as input. Returns as IO Statement
 prepareInsertMeasurementStmt conn = prepare conn "INSERT INTO measurements VALUES (DEFAULT, ?, ?, ?, ?, ?)"
 
--- I'm not sure about this part , if it works for measurement or not
-saveMeasurements :: [Measurement] -> Connection -> IO ()
+saveMeasurements :: [Measurement] -> Connection -> IO () -- ^ Takes a list of Measurements and a Connection as input. Inserts parameters into the database. Returns an IO() 
 saveMeasurements measurements conn = do
                             stmt <- prepareInsertMeasurementStmt conn
                             executeMany stmt (measurementListToSqlValues measurements)

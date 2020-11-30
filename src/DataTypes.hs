@@ -4,7 +4,8 @@ module DataTypes (Record(location, city, country, measurements, coordinates), Pa
 import Data.Aeson
 import GHC.Generics
 
-data Measurement = Measurement { -- Custom data type definition
+-- | Custom data type definition for measurements
+data Measurement = Measurement { 
   parameter :: String,
   value :: Double,
   lastUpdated :: String,
@@ -13,28 +14,31 @@ data Measurement = Measurement { -- Custom data type definition
 instance FromJSON Measurement
 instance ToJSON Measurement
 
-data Coordinates = Coordinates {
+-- | Custom data type definition for coordinates
+data Coordinates = Coordinates { 
   latitude :: Double,
   longitude :: Double
-} deriving (Show, Generic)
+} deriving (Show, Generic) -- Making the new type an instance of the built in type classes
 instance FromJSON Coordinates
 instance ToJSON Coordinates
 
-data Record = Record {
+-- | Custom data type definition for records
+data Record = Record { 
   location :: String,
   city :: String,
   country :: String,
   measurements :: [Measurement],
   coordinates :: Coordinates
-} deriving (Show, Generic)
+} deriving (Show, Generic) -- Making the new type an instance of the built in type classes
 instance FromJSON Record
 instance ToJSON Record
 
-data Parameter = Parameter{
+-- | Custom data type definition for parameters
+data Parameter = Parameter{ 
   id :: String,
   name :: String,
   description :: String,
   preferredUnit :: String
-}deriving (Show, Generic)
+} deriving (Show, Generic) -- Making the new type an instance of the built in type classes 
 instance FromJSON Parameter
 instance ToJSON Parameter
