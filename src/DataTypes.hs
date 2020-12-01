@@ -1,5 +1,12 @@
 {-# LANGUAGE DeriveGeneric #-}
-module DataTypes (-- | Provides a set of data types that are utilised within the Parse and Database modules.
+
+{-|
+Module      : DataTypes
+Description : Provides a set of data types that are utilised within the Parse and Database modules
+
+Provides a set of data types that are utilised within the Parse and Database modules
+-}
+module DataTypes (
   Record(location, city, country, measurements, coordinates),
   Parameter(id, name, description, preferredUnit),
   Measurement(parameter, value, lastUpdated, unit), 
@@ -33,9 +40,13 @@ data Record = Record {
   country :: String,
   measurements :: [Measurement],
   coordinates :: Coordinates
-} deriving (Show, Generic) -- Making the new type an instance of the built in type classes
-instance FromJSON Record
-instance ToJSON Record
+} deriving (Show -- ^ Using default implementation for Show
+  , Generic -- ^ Using default implementation for Generic
+ ) 
+-- | Allows a Record to be instantiated from a JSON representation
+instance FromJSON Record  
+-- | Allows JSON representations to be created from a Record
+instance ToJSON Record 
 
 -- | Custom data type definition for parameters
 data Parameter = Parameter{ 
@@ -43,6 +54,10 @@ data Parameter = Parameter{
   name :: String,
   description :: String,
   preferredUnit :: String
-} deriving (Show, Generic) -- Making the new type an instance of the built in type classes 
+} deriving (Show -- ^ Using default implementation for Show
+  , Generic -- ^ Using default implementation for Generic
+  ) 
+-- | Allows a Parameter to be instantiated from a JSON representation
 instance FromJSON Parameter
-instance ToJSON Parameter
+-- | Allows JSON representations to be created from a Parameter 
+instance ToJSON Parameter 
