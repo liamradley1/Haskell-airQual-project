@@ -3,7 +3,7 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
 
-    module Database(
+    module Database( -- | Provides code that allows for the initialisation, conversion from data type to SqlValue, and insertion to a database. Make sure line 19 is altered to match the PostgreSQL login details for your machine
         initialiseDB , saveRecords , saveParameters , saveMeasurements
     ) where
 
@@ -11,7 +11,6 @@ import Database.HDBC
 import Database.HDBC.PostgreSQL
 import DataTypes
 import Parse
-import GHC.Records (getField)
 
 
 initialiseDB :: IO Connection -- ^ An IO function that initialises the databases if they do not already exist. Returns an IO Connection

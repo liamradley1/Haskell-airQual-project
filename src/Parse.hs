@@ -1,8 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-} -- Language extention
 {-# LANGUAGE DuplicateRecordFields #-} -- Using DuplicateRecordFields allows the records to use duplicate field labels.
 
-module Parse
-  (parse, parseParameters, -- Defining what needs to be exported
+module Parse  
+  (-- | Used for parsing to and from JSON files into other data types.
+    parse, parseParameters, -- Defining what needs to be exported
     Records (results),
     Parameters (results),
 ) where

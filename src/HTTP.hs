@@ -1,5 +1,6 @@
-module HTTP
-(download, URL) where -- Exporting the download function
+module HTTP 
+(-- | Used for making HTTP requests to an API, and downloading the contents of the call.
+    download, URL) where -- Exporting the download function
 
 import qualified Data.ByteString.Lazy.Char8 as BytStr --Importing the libary to get ByteString
 import Network.HTTP.Simple

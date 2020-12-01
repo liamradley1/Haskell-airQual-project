@@ -1,5 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-}
-module DataTypes (Record(location, city, country, measurements, coordinates), Parameter(id, name, description, preferredUnit), Measurement(parameter, value, lastUpdated, unit), Coordinates(latitude, longitude)) where
+module DataTypes (-- | Provides a set of data types that are utilised within the Parse and Database modules.
+  Record(location, city, country, measurements, coordinates),
+  Parameter(id, name, description, preferredUnit),
+  Measurement(parameter, value, lastUpdated, unit), 
+  Coordinates(latitude, longitude)) where 
 
 import Data.Aeson
 import GHC.Generics
