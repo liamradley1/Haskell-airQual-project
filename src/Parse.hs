@@ -21,16 +21,20 @@ import DataTypes -- Calling the module which defines the custom data types requi
 -- | Custom data type for holding multiple rows of results
 data Records = Records { 
   results :: [Record] -- ^ A list of type 'Record' (defined in the library DataTypes)
-} deriving (Show, Generic) -- Making the new type an instance of the built in type classes
--- ^ Making our data type an instance of the type class FromJSON
+} deriving (Show -- ^ Using default implementation of Show
+  , Generic -- ^ Using default implementation of Generic
+  )
+-- | Making our data type an instance of the type class FromJSON
 instance FromJSON Records
--- ^ Making our data type an instance of the type class ToJSON 
+-- | Making our data type an instance of the type class ToJSON 
 instance ToJSON Records 
 
 -- | Custom data type for holding multiple parameters and their definitions
 data Parameters = Parameters{ 
    results :: [Parameter]
-} deriving (Show, Generic)
+} deriving (Show  -- ^ Using default implementation of Show
+  , Generic -- ^ Using default implementation of Generic
+  )
 -- | Making our data type an instance of the type class FromJSON
 instance FromJSON Parameters
 -- | Making our data type an instance of the type class ToJSON 

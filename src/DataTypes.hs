@@ -21,16 +21,24 @@ data Measurement = Measurement {
   value :: Double,
   lastUpdated :: String,
   unit :: String
-} deriving (Show, Generic) -- Making the new type an instance of the built in type classes
+} deriving (Show -- ^ Using default implementation for Show
+  , Generic -- ^ Using default implementation for Generic
+  )
+-- | Allow a Measurement to be instantiated from a JSON representation
 instance FromJSON Measurement
+-- | Allows JSON representations to be created from a Measurement
 instance ToJSON Measurement
 
 -- | Custom data type definition for coordinates
 data Coordinates = Coordinates { 
   latitude :: Double,
   longitude :: Double
-} deriving (Show, Generic) -- Making the new type an instance of the built in type classes
+} deriving (Show -- ^ Using default implementation for Show
+  , Generic -- ^ Using default implementation for Generic
+  ) 
+-- | Allow a set of Coordinates to be instantiated from a JSON representation
 instance FromJSON Coordinates
+-- | Allows JSON representations to be created from a set of Coordinates 
 instance ToJSON Coordinates
 
 -- | Custom data type definition for records

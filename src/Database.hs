@@ -102,9 +102,9 @@ prepareInsertParameterStmt conn = prepare conn "INSERT INTO parameter VALUES (?,
 -- | Automation function for bulk saving Parameters. Takes a list of Parameters and a Connection as input. Inserts parameters into the database. Returns an IO ()
 saveParameters :: [Parameter] -> Connection -> IO () 
 saveParameters parameters conn = do
-                         stmt <- prepareInsertParameterStmt conn
-                         executeMany stmt (map parametersToSqlValue parameters)
-                         commit conn
+                        stmt <- prepareInsertParameterStmt conn
+                        executeMany stmt (map parametersToSqlValue parameters)
+                        commit conn
 
 -- | Provides a prepared statement for inserting measurements into the database. Takes a Connection as input. Returns as IO Statement
 prepareInsertMeasurementStmt :: Connection -> IO Statement 
@@ -113,6 +113,6 @@ prepareInsertMeasurementStmt conn = prepare conn "INSERT INTO measurements VALUE
 -- | Automation function for bulk saving Measurements. Takes a list of Measurements and a Connection as input. Inserts parameters into the database. Returns an IO()
 saveMeasurements :: [Measurement] -> Connection -> IO ()  
 saveMeasurements measurements conn = do
-                            stmt <- prepareInsertMeasurementStmt conn
-                            executeMany stmt (measurementListToSqlValues measurements)
-                            commit conn
+                        stmt <- prepareInsertMeasurementStmt conn
+                        executeMany stmt (measurementListToSqlValues measurements)
+                        commit conn

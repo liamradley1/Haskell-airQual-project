@@ -1,12 +1,12 @@
 {-|
 Module      : HTTP
-Description : Used for making HTTP requests to a REST API, and for downloafing of the contents from this API call.
+Description : Used for making HTTP requests to a REST API, and for downloading of the contents from this API call.
 
-Used for making HTTP requests to a REST API, and for downloafing of the contents from this API call.
+Used for making HTTP requests to a REST API, and for downloading of the contents from this API call.
 -}
 module HTTP 
 (
-    download, URL) where -- Exporting the download function
+    download, URL) where -- Exporting the download function and URL synonym
 
 import qualified Data.ByteString.Lazy.Char8 as BytStr -- Importing the libary to get ByteString
 import Network.HTTP.Simple
