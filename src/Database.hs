@@ -42,7 +42,7 @@ initialiseDB = do
         run conn "CREATE TABLE IF NOT EXISTS measurements(\
             \measurementId SERIAL PRIMARY KEY,\
             \locationId INTEGER NOT NULL,\
-            \id INTEGER NOT NULL,\
+            \parameter INTEGER NOT NULL,\
             \value NUMERIC(10,6) NOT NULL,\
             \lastUpdated VARCHAR(100) NOT NULL,\
             \unit VARCHAR(100) NOT NULL\
