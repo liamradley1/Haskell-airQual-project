@@ -5,8 +5,11 @@ module Main where
 
 import HTTP --Importing the HTTP library
 import Parse -- Importing the Parse library
-import Database (initialiseDB , saveRecords , saveParameters , saveMeasurements) -- Importing the Database library
+import Database (initialiseDB , saveRecords , saveParameters , saveMeasurements,
+                 selectLocations, deleteLocations, joinParameterAndMeasurement ,dbDisconnect) -- Importing the Database library
 import GHC.Records (getField)
+import System.Environment
+
 main :: IO ()
 main = do
     let urlForPara = "https://raw.githubusercontent.com/liamradley1/functional-assignment/main/parameters.json" -- The url of the localised source from where we are requesting the data from
@@ -36,3 +39,20 @@ main = do
         saveRecords results conn
         saveMeasurements results conn
         print "Records and Measurements saved into db" 
+
+        args <- getArgs
+        case args of
+          ["selectLocations"] -> selectLocations conn
+          ["deleteLocations"] -> deleteLocations conn
+          ["joinParameterAndMeasurement"] -> joinParameterAndMeasurement conn
+
+        print "Disconnecting from database..."
+        dbDisconnect conn
+
+  syntaxError = putStrLn 
+   "Usage: System command [args]\n\
+   \\n\
+   \select location           Selects all locations in ascending order, from locations table \n\
+   \delet location            Deletes countries, based on user input \n\
+   \join                      Joins Parameter and Measurement table to retrieve some data\n"
+   

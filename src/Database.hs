@@ -9,7 +9,8 @@ Ensure that the initialiseDB function is altered to match the PostgreSQL login d
 -}
 
     module Database(
-        initialiseDB , saveRecords , saveParameters , saveMeasurements
+        initialiseDB , saveRecords , saveParameters , saveMeasurements,
+        selectLocations, deleteLocations, joinParameterAndMeasurement , dbDisconnect
     ) where
 
 import Database.HDBC
@@ -125,4 +126,33 @@ extractLocations [] _ = putStr ""
 extractLocations (x:xs) stmt = do
     executeMany stmt (measurementListToSqlValues (measurements x) (location x))
     extractLocations xs stmt
+
+---------------------------------------------Disconnecting From DB-------------------------------------
+
+dbDisconnect :: Connection -> IO ()
+dbDisconnect = disconnect
+-----------------------------------------------Queries--------------------------------------------------
+
+selectLocations :: Connection -> IO [SQLValue]
+selectLocations conn = do
+     res <- query conn "SELECT * FROM locations ORDER BY country ASC"[]
+     putStrln "Selecting locations ..."
+     commit conn
+     return conn
+
+deleteLocations :: Connection -> IO [SqlValue]
+deleteLocations conn = do
+     res<- execute conn "DELETE FROM locations WHERE country (?)"[]
+      putStrln "Deleting countries ..."
+       commit conn
+       return conn
+
+joinParameterAndMeasurement :: Connection - > IO [SqlValue]
+joinParameterAndMeasurement conn = do 
+    res <- query conn "SELECT measurements.unit , parameter.name , parameter.preferredUnit
+                       FROM measurements INNER JOIN parameter ON 
+                       measurements.parameter = parameter.id"[]
+     putStrln "Joining parameters and measurements tables ..."
+     commit conn
+     return conn
 
