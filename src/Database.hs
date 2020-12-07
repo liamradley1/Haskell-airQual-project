@@ -1,7 +1,5 @@
-{-# LANGUAGE DeriveGeneric #-} -- Language extention
 {-# LANGUAGE DuplicateRecordFields #-} -- Using DuplicateRecordFields allows the records to use duplicate field labels.
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TypeApplications #-}
 {-|
 Module      : Database
 Description : Provides functionality for initialisation of the database, conversion of data types to SqlValues, and insertion of SqlValues to the database. 
@@ -17,15 +15,14 @@ Ensure that the initialiseDB function is altered to match the PostgreSQL login d
 import Database.HDBC
 import Database.HDBC.PostgreSQL
 import DataTypes
-import Parse
 
 -- | An IO function that initialises the databases if they do not already exist. Returns an IO Connection
 initialiseDB :: IO Connection 
 initialiseDB = do
-        conn <- connectPostgreSQL "host=localhost dbname = airqual_db user=postgres password =admin"
+        conn <- getConn
         run conn "CREATE TABLE IF NOT EXISTS locations (\
             \locationId SERIAL NOT NULL PRIMARY KEY,\
-            \location VARCHAR(100) NOT NULL,\
+            \location VARCHAR(100) NOT NULL UNIQUE,\
             \city VARCHAR(100) NOT NULL,\
             \country VARCHAR(100) NOT NULL,\
             \latitude NUMERIC(10,6) NOT NULL,\
@@ -33,7 +30,7 @@ initialiseDB = do
             \)" []
 
         run conn "CREATE TABLE IF NOT EXISTS parameter(\
-            \id VARCHAR(100) NOT NULL PRIMARY KEY,\
+            \id VARCHAR(100) PRIMARY KEY,\
             \name VARCHAR(100) NOT NULL,\
             \description VARCHAR(100) NOT NULL,\
             \preferredUnit VARCHAR(100) NOT NULL\
@@ -41,20 +38,25 @@ initialiseDB = do
 
         run conn "CREATE TABLE IF NOT EXISTS measurements(\
             \measurementId SERIAL PRIMARY KEY,\
-            \locationId INTEGER NOT NULL,\
-            \parameter INTEGER NOT NULL,\
+            \location VARCHAR(100) NOT NULL,\
+            \parameter VARCHAR(100) NOT NULL,\
             \value NUMERIC(10,6) NOT NULL,\
             \lastUpdated VARCHAR(100) NOT NULL,\
-            \unit VARCHAR(100) NOT NULL\
+            \unit VARCHAR(100) NOT NULL,\
+            \CONSTRAINT location_fk FOREIGN KEY(location) references locations(location),\
+            \CONSTRAINT param_fk FOREIGN KEY(parameter) references parameter(id)\
             \)"[]
 
         commit conn
         return conn
 
+getConn :: IO Connection
+getConn = connectPostgreSQL "host=localhost dbname = airqual_db user=postgres password =admin"
 
 -- | Takes a Measurement as input and returns it as a list of SqlValues - a format that can be used in a prepared statement
-measurementToSqlValues :: Measurement -> [SqlValue] 
-measurementToSqlValues measurement = [
+measurementToSqlValues :: Measurement -> String -> [SqlValue] 
+measurementToSqlValues measurement location = [
+     toSql location,
      toSql $ parameter measurement,
      toSql $ value measurement,
      toSql $ lastUpdated measurement,
@@ -62,8 +64,9 @@ measurementToSqlValues measurement = [
     ]
 
 -- | Automation function that takes a list of Measurements and returns a list of lists of SQLValues for insertion
-measurementListToSqlValues :: [Measurement] -> [[SqlValue]] 
-measurementListToSqlValues = map measurementToSqlValues 
+measurementListToSqlValues [] _ = []
+measurementListToSqlValues (x:xs) location = measurementToSqlValues x location : measurementListToSqlValues xs location
+    
 
 recordToSqlValues :: Record -> [SqlValue]
 recordToSqlValues record = [
@@ -86,7 +89,7 @@ parametersToSqlValue parameter = [
 -- ^ Provides a prepared statement for inserting locations into the database.
 -- ^ Takes a Connection as an input. Returns an IO Statement.
 prepareInsertLocationStmt :: Connection -> IO Statement  
-prepareInsertLocationStmt conn = prepare conn "INSERT INTO locations VALUES (DEFAULT, ?, ?, ?, ?, ?)"
+prepareInsertLocationStmt conn = prepare conn "INSERT INTO locations VALUES (DEFAULT, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING"
 
 -- | Automation function for bulk saving Records. Takes a list of Records and a Connection as input. Inserts records into the database. Returns an IO ()
 saveRecords :: [Record] -> Connection -> IO () 
@@ -97,7 +100,7 @@ saveRecords records conn = do
 
 -- | Provides a prepared statement for inserting parameters into the database. Takes a Connection as input. Returns an IO Statement
 prepareInsertParameterStmt :: Connection -> IO Statement 
-prepareInsertParameterStmt conn = prepare conn "INSERT INTO parameter VALUES (?, ?, ?, ?)"
+prepareInsertParameterStmt conn = prepare conn "INSERT INTO parameter VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING"
 
 -- | Automation function for bulk saving Parameters. Takes a list of Parameters and a Connection as input. Inserts parameters into the database. Returns an IO ()
 saveParameters :: [Parameter] -> Connection -> IO () 
@@ -108,11 +111,19 @@ saveParameters parameters conn = do
 
 -- | Provides a prepared statement for inserting measurements into the database. Takes a Connection as input. Returns as IO Statement
 prepareInsertMeasurementStmt :: Connection -> IO Statement 
-prepareInsertMeasurementStmt conn = prepare conn "INSERT INTO measurements VALUES (DEFAULT, ?, ?, ?, ?, ?)"
+prepareInsertMeasurementStmt conn = prepare conn "INSERT INTO measurements VALUES (DEFAULT, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING"
 
 -- | Automation function for bulk saving Measurements. Takes a list of Measurements and a Connection as input. Inserts parameters into the database. Returns an IO()
-saveMeasurements :: [Measurement] -> Connection -> IO ()  
-saveMeasurements measurements conn = do
+saveMeasurements :: [Record] -> Connection -> IO ()  
+saveMeasurements record conn = do
                         stmt <- prepareInsertMeasurementStmt conn
-                        executeMany stmt (measurementListToSqlValues measurements)
+                        iwanttodie record stmt
+                        putStrLn "pls"
                         commit conn
+
+iwanttodie :: [Record] -> Statement -> IO ()
+iwanttodie [] _ = putStrLn " "
+iwanttodie (x:xs) stmt = do
+    executeMany stmt (measurementListToSqlValues (measurements x) (location x))
+    iwanttodie xs stmt
+

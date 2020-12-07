@@ -7,41 +7,37 @@ import HTTP --Importing the HTTP library
 import Parse -- Importing the Parse library
 import Database (initialiseDB , saveRecords , saveParameters , saveMeasurements) -- Importing the Database library
 import GHC.Records (getField)
+import DataTypes
 
 main :: IO ()
 main = do
-    let url = "https://api.openaq.org/v1/latest?has_geo=true&order_by=city&limit=100" -- ##Change to 10,000 for final
-    json <- download url -- Downloads the data
-    case (parse json) of -- Parsing the json file into a list of record
-      Left errors -> print errors -- If the parsing fails, print the error
-      Right record -> do
-        print . (take 3) $ (getField @"results" record)-- If parsing is sucessfull, we use getField from GHC.Records to disambiguate which 'results' & print the first 3 records
-        print "Initializing Database ..."
-        conn <- initialiseDB
-        print "Database initialized..."
-
-        --Please uncomment these 2 lines , when Database.hs is working fine
-        saveRecords (getField @"results" record) conn
-        print "Records saved into db" 
-        
-        
-
-    let urlForPara = "https://api.openaq.org/v1/parameters" -- The url of the API from where we are requesting the data from
+    let urlForPara = "https://raw.githubusercontent.com/liamradley1/functional-assignment/main/parameters.json" -- The url of the localised source from where we are requesting the data from
     jsonPara <- download urlForPara -- Downloads the data
-    case (parseParameters jsonPara) of -- Parsing the json file into a list of parameter
+    print jsonPara
+    case parseParameters jsonPara of -- Parsing the json file into a list of parameter
       Left errors -> print errors -- If the parsing fails, print the error
       Right para -> do
         print para -- If parsing is successful, print the response
         print "Initializing Database ..."
         conn <- initialiseDB
         print "Database initialized..."
-        
-        --Please uncomment these 2 lines , when Database.hs is working fine
         saveParameters (getField @"results" para) conn
         print "Parameters saved into db"
-        
-        
+        print "Done!"
 
+    let url = "https://raw.githubusercontent.com/liamradley1/functional-assignment/main/measurements.json"
+    json <- download url -- Downloads the data
+    case parse json of -- Parsing the json file into a list of record
+      Left errors -> print errors -- If the parsing fails, print the error
+      Right record -> do
+        let results = getField @"results" record
+        -- print . take 3 $ results-- If parsing is successful, we use getField from GHC.Records to disambiguate which 'results' & print the first 3 records
+        print "Connecting to database ..."
+        conn <- initialiseDB
+        print "Database initialized..."
+        saveRecords results conn
+        saveMeasurements results conn
+        print "Records and Measurements saved into db" 
    ------------------------------------------previous codes-----------------------------------------------------
     --print json
 
