@@ -117,13 +117,12 @@ prepareInsertMeasurementStmt conn = prepare conn "INSERT INTO measurements VALUE
 saveMeasurements :: [Record] -> Connection -> IO ()  
 saveMeasurements record conn = do
                         stmt <- prepareInsertMeasurementStmt conn
-                        iwanttodie record stmt
-                        putStrLn "pls"
+                        extractLocations record stmt
                         commit conn
 
-iwanttodie :: [Record] -> Statement -> IO ()
-iwanttodie [] _ = putStrLn " "
-iwanttodie (x:xs) stmt = do
+extractLocations :: [Record] -> Statement -> IO ()
+extractLocations [] _ = putStr ""
+extractLocations (x:xs) stmt = do
     executeMany stmt (measurementListToSqlValues (measurements x) (location x))
-    iwanttodie xs stmt
+    extractLocations xs stmt
 
