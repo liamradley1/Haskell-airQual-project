@@ -9,20 +9,29 @@ Ensure that the initialiseDB function is altered to match the PostgreSQL login d
 -}
 
     module Database(
-        initialiseDB , saveRecords , saveParameters , saveMeasurements,
-        selectLocations, deleteLocations, joinParameterAndMeasurement , dbDisconnect
+        initialiseDB , saveRecords , saveParameters , saveMeasurements, getConn, dropDB, joinFromSqlValues,
+        selectLocations, deleteLocations, joinParameterAndMeasurement , dbDisconnect, measurementsFromSqlValues
     ) where
 
 import Database.HDBC
 import Database.HDBC.PostgreSQL
 import DataTypes
 
+dropDB :: IO ()
+dropDB = do
+    conn <- getConn
+    run conn "DROP TABLE IF EXISTS measurements"[]
+    run conn "DROP TABLE IF EXISTS parameter"[]
+    run conn "DROP TABLE IF EXISTS locations"[]
+    commit conn
+    print "Reset."
+
 -- | An IO function that initialises the databases if they do not already exist. Returns an IO Connection
 initialiseDB :: IO Connection 
 initialiseDB = do
         conn <- getConn
         run conn "CREATE TABLE IF NOT EXISTS locations (\
-            \locationId SERIAL NOT NULL PRIMARY KEY,\
+            \locationId SERIAL NOT NULL PRIMARY KEY ,\
             \location VARCHAR(100) NOT NULL UNIQUE,\
             \city VARCHAR(100) NOT NULL,\
             \country VARCHAR(100) NOT NULL,\
@@ -44,10 +53,9 @@ initialiseDB = do
             \value NUMERIC(10,6) NOT NULL,\
             \lastUpdated VARCHAR(100) NOT NULL,\
             \unit VARCHAR(100) NOT NULL,\
-            \CONSTRAINT location_fk FOREIGN KEY(location) references locations(location),\
-            \CONSTRAINT param_fk FOREIGN KEY(parameter) references parameter(id)\
+            \CONSTRAINT location_fk FOREIGN KEY(location) references locations(location) ON DELETE CASCADE,\
+            \CONSTRAINT param_fk FOREIGN KEY(parameter) references parameter(id) ON DELETE NO ACTION\
             \)"[]
-
         commit conn
         return conn
 
@@ -68,7 +76,6 @@ measurementToSqlValues measurement location = [
 measurementListToSqlValues [] _ = []
 measurementListToSqlValues (x:xs) location = measurementToSqlValues x location : measurementListToSqlValues xs location
     
-
 recordToSqlValues :: Record -> [SqlValue]
 recordToSqlValues record = [
     toSql $ location record,
@@ -133,26 +140,49 @@ dbDisconnect :: Connection -> IO ()
 dbDisconnect = disconnect
 -----------------------------------------------Queries--------------------------------------------------
 
-selectLocations :: Connection -> IO [SQLValue]
+selectLocations :: Connection -> IO [[SqlValue]]
 selectLocations conn = do
-     res <- query conn "SELECT * FROM locations ORDER BY country ASC"[]
-     putStrln "Selecting locations ..."
-     commit conn
-     return conn
+    res <- quickQuery' conn "SELECT * FROM locations ORDER BY country ASC"[]
+    putStrLn "Selecting locations ..."
+    commit conn
+    return res
 
-deleteLocations :: Connection -> IO [SqlValue]
-deleteLocations conn = do
-     res<- execute conn "DELETE FROM locations WHERE country (?)"[]
-      putStrln "Deleting countries ..."
-       commit conn
-       return conn
+convertSqlValues :: [SqlValue] -> [String]
+convertSqlValues [] = []
+convertSqlValues x = do
+    [(fromSql $ x !! 1 :: String ) ++ ", " ++ (fromSql $ x !! 2 :: String ) ++ ", " ++ (fromSql $ x !! 3 :: String ) ++ ", " ++ show (fromSql $ x !! 4 :: Double ) ++ ", " ++ show (fromSql $ x !! 5 :: Double )]
 
-joinParameterAndMeasurement :: Connection - > IO [SqlValue]
+convertJoinSqlValues [] = []
+convertJoinSqlValues (x:xs) = do
+    (fromSql x :: String) : convertJoinSqlValues xs 
+measurementsFromSqlValues :: [[SqlValue]] -> Integer -> IO ()
+measurementsFromSqlValues [] _ = putStrLn ""
+measurementsFromSqlValues (x:xs) counter = do
+    let val = convertSqlValues x 
+    putStr (show counter ++ ". ")
+    print val
+    measurementsFromSqlValues xs (counter + 1)
+
+joinFromSqlValues [] _ = putStrLn ""
+joinFromSqlValues (x:xs) counter = do
+    let val = convertJoinSqlValues x
+    putStr (show counter ++ ". ")
+    print val
+    joinFromSqlValues xs (counter + 1)
+
+deleteLocations :: Connection -> String -> IO [[SqlValue]]
+deleteLocations conn toDelete = do
+    res <- quickQuery' conn "DELETE FROM locations WHERE country = (?)"[toSql toDelete]
+    putStrLn "Deleting countries ..."
+    commit conn
+    return res
+
+joinParameterAndMeasurement :: Connection -> IO [[SqlValue]]
 joinParameterAndMeasurement conn = do 
-    res <- query conn "SELECT measurements.unit , parameter.name , parameter.preferredUnit
-                       FROM measurements INNER JOIN parameter ON 
-                       measurements.parameter = parameter.id"[]
-     putStrln "Joining parameters and measurements tables ..."
-     commit conn
-     return conn
+    res <- quickQuery' conn "SELECT measurements.measurementId, measurements.unit, parameter.name, parameter.preferredUnit \
+        \ FROM measurements INNER JOIN parameter ON \
+        \ measurements.parameter = parameter.id ORDER BY measurements.measurementId ASC"[]
+    putStrLn "Joining parameters and measurements tables ..."
+    commit conn
+    return res
 
