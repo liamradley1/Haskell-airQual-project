@@ -53,7 +53,7 @@ main = do
       res <- joinParameterAndMeasurement conn
       joinFromSqlValues res 1
     _ -> do 
-      print  "Usage: System command [args]"
+      print "Usage: System command [args]"
       print "selectLocations                                  Selects all locations in ascending order, from locations table"
       print "deleteLocations                                  Deletes countries, based on user input"
       print "joinParameterAndMeasurement                      Joins Parameter and Measurement table to retrieve some data"

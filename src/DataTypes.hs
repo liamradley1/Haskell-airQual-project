@@ -2,9 +2,9 @@
 
 {-|
 Module      : DataTypes
-Description : Provides a set of data types that are utilised within the Parse and Database modules
+Description : Provides a set of data types that are utilised within the Parse and Database modules.
 
-Provides a set of data types that are utilised within the Parse and Database modules
+Provides a set of data types that are utilised within the Parse and Database modules.
 -}
 module DataTypes (
   Record(location, city, country, measurements, coordinates),
