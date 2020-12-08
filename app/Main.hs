@@ -6,7 +6,7 @@ module Main where
 import HTTP --Importing the HTTP library
 import Parse -- Importing the Parse library
 import Database (initialiseDB, saveRecords, saveParameters, saveMeasurements, getConn, dropDB, joinFromSqlValues,
-  selectLocations, deleteLocations, joinParameterAndMeasurement , dbDisconnect, measurementsFromSqlValues) -- Importing the Database library
+  selectLocations, deleteLocations, joinParameterAndMeasurement, measurementsFromSqlValues) -- Importing the Database library
 import GHC.Records (getField)
 import System.Environment
 

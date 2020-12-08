@@ -35,7 +35,7 @@ initialiseDB :: IO Connection
 initialiseDB = do
         conn <- getConn
         run conn "CREATE TABLE IF NOT EXISTS locations (\
-            \locationId SERIAL NOT NULL PRIMARY KEY ,\
+            \locationId SERIAL PRIMARY KEY ,\
             \location VARCHAR(100) NOT NULL UNIQUE,\
             \city VARCHAR(100) NOT NULL,\
             \country VARCHAR(100) NOT NULL,\
@@ -187,7 +187,7 @@ joinFromSqlValues (x:xs) counter = do
 -- | Deletes a selected country's locations and measurements from the database.
 deleteLocations :: Connection -> String -> IO ()
 deleteLocations conn toDelete = do
-    res <- quickQuery' conn "DELETE FROM locations WHERE country = (?)" [toSql toDelete]
+    quickQuery' conn "DELETE FROM locations WHERE country = (?)" [toSql toDelete]
     putStrLn "Deleting countries ..."
     commit conn
 
