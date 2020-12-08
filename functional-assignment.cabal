@@ -4,16 +4,15 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a54058a2cd9b4808018a1479c0519a91d845d0bdea5cc9ce82d94905242c2775
+-- hash: 3d7d768f376a66fe2304308c93f9a28f1d44c707562ccdd0f5eed44f936a4087
 
 name:           functional-assignment
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/functional-assignment#readme>
-homepage:       https://github.com/githubuser/functional-assignment#readme
-bug-reports:    https://github.com/githubuser/functional-assignment/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2020 Author name here
+description:    Please see the README on GitHub at <https://github.com/liamradley1/functional-assignment#readme>
+homepage:       https://github.com/liamradley1/functional-assignment#readme
+bug-reports:    https://github.com/liamradley1/functional-assignment/issues
+author:         Liam Radley, Sara Nikamalfard, Hassan Bashir
+maintainer:     Liam Radley, Sara Nikamalfard, Hassan Bashir
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -23,11 +22,10 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/functional-assignment
+  location: https://github.com/liamradley1/functional-assignment
 
 library
   exposed-modules:
-      Automate
       Database
       DataTypes
       HTTP
